@@ -48,6 +48,7 @@ int main(void)
     BITMAP *bg;
     BITMAP *player;
     int x, y;
+    int xspeed = 2, yspeed = 2;
 
     // initialize
     allegro_init();
@@ -95,10 +96,10 @@ int main(void)
         if(key[KEY_ESC]) gameover = 1;
 
         // move bitmap
-        if(key[KEY_LEFT]) x--;
-        if(key[KEY_RIGHT]) x++;
-        if(key[KEY_UP]) y--;
-        if(key[KEY_DOWN]) y++;
+        if(key[KEY_LEFT]) x -= xspeed;
+        if(key[KEY_RIGHT]) x += xspeed;
+        if(key[KEY_UP]) y -= yspeed;
+        if(key[KEY_DOWN]) y += yspeed;
 
         // UPDATE
         //
