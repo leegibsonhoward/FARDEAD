@@ -51,7 +51,7 @@ int main(void)
 
     // initialize
     allegro_init();
-    set_color_depth(16);
+    set_color_depth(24);
     set_gfx_mode(MODE, WIDTH, HEIGHT, 0, 0);
     install_keyboard();
     install_timer();
@@ -95,21 +95,21 @@ int main(void)
         if(key[KEY_ESC]) gameover = 1;
 
         // move bitmap
-        if(key[KEY_LEFT])
+        if(key[KEY_LEFT] || key[KEY_A])
         {
             facing = 0;
             x -= xspeed;
         }
-        if(key[KEY_RIGHT])
+        if(key[KEY_RIGHT] || key[KEY_D])
         {
             facing = 1;
             x += xspeed;
         }
-        if(key[KEY_UP])
+        if(key[KEY_UP] || key[KEY_W])
         {
             y -= yspeed;
         }
-        if(key[KEY_DOWN])
+        if(key[KEY_DOWN] || key[KEY_S])
         {
             y += yspeed;
         }
