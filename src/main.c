@@ -42,13 +42,13 @@ void display_info(struct BITMAP *buffer)
 
 int main(void)
 {
-    int gameover = 0;
-
     BITMAP *buffer;
     BITMAP *bg;
     BITMAP *player;
     int x, y;
     int xspeed = 2, yspeed = 2;
+    int facing = 0;
+    int gameover = 0;
 
     // initialize
     allegro_init();
@@ -90,41 +90,68 @@ int main(void)
     // game loop
     while (!gameover)
     {
-        // INPUT
-        //
+        // INPUT /////////////////////////
+
         // short circuit
         if(key[KEY_ESC]) gameover = 1;
 
         // move bitmap
-        if(key[KEY_LEFT]) x -= xspeed;
-        if(key[KEY_RIGHT]) x += xspeed;
-        if(key[KEY_UP]) y -= yspeed;
-        if(key[KEY_DOWN]) y += yspeed;
+        if(key[KEY_LEFT])
+        {
+            facing = 0;
+            x -= xspeed;
+        }
+        if(key[KEY_RIGHT])
+        {
+            facing = 1;
+            x += xspeed;
+        }
+        if(key[KEY_UP])
+        {
+            y -= yspeed;
+        }
+        if(key[KEY_DOWN])
+        {
+            y += yspeed;
+        }
 
-        // UPDATE
-        //
+        // UPDATE /////////////////////////////////
+
         // fill screen with background image
         blit(bg, buffer, 0, 0, 0, 0, WIDTH, HEIGHT);
 
-        //draw the sprite
-        draw_sprite(buffer, player, x, y);
+        if(facing)
+        {
+            //draw the sprite
+            draw_sprite(buffer, player, x, y);
+        }
+        else
+        {
+            draw_sprite_h_flip(buffer, player, x, y);
+        }
+
         ticks++;
 
+
+        // RENDER /////////////////////////////////////////
+
+        // display allegro/system info
         // TODO: add toggle functionality to display info
         display_info(buffer);
 
-        // DRAW
-        //
-        // refresh the screen
+        // lock bitmap
         acquire_screen();
+        // refresh the screen
         blit(buffer, screen, 0, 0, 0, 0, WIDTH, HEIGHT);
+        // unlock bitmap
         release_screen();
 
-        // slow the game down
+        // slow down the game
         resting = 0;
         rest_callback(13, rest1);
 
-        // prevent above 60FPS
+        // prevent going above 60FPS
+        // TODO: cap actual game speed
         if(framerate > 60) framerate = 60;
     }
 
