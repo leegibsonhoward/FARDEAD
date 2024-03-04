@@ -30,13 +30,12 @@ void rest1(void)
 }
 END_OF_FUNCTION(rest1)
 
-void display_info(struct BITMAP *buffer)
+void display_info(struct BITMAP *buffer, int x, int y) // x and y track player position.
 {
-
     // display info
     textprintf_ex(buffer, font, 10, 10, WHITE, -1, "Ticks: %d", counter);
-
     textprintf_ex(buffer, font, 10, 20, WHITE, -1, "FPS: %d", framerate);
+    textprintf_ex(buffer, font, 10, 30, WHITE, -1, "Player Position: x %d, y %d", x, y);
     textprintf_ex(buffer, font, 10, SCREEN_H - 20, WHITE, -1, "Press [ESC] to quit");
 }
 
@@ -115,6 +114,7 @@ int main(void)
             y += yspeed;
         }
 
+        if (key[KEY_SPACE]) ;
         // UPDATE /////////////////////////////////
 
         // fill screen with background image
@@ -137,7 +137,7 @@ int main(void)
 
         // display allegro/system info
         // TODO: add toggle functionality to display info
-        display_info(buffer);
+        display_info(buffer, x, y);
 
         // lock bitmap
         acquire_screen();
