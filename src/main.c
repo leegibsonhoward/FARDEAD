@@ -39,14 +39,21 @@ void display_info(struct BITMAP *buffer, int x, int y) // x and y track player p
     textprintf_ex(buffer, font, 10, SCREEN_H - 20, WHITE, -1, "Press [ESC] to quit");
 }
 
+struct playerTag {
+    int x;
+    int y;
+    int w;
+    int h;
+    int speed;
+    int facing;
+}player;
+
 int main(void)
 {
     BITMAP *buffer;
     BITMAP *bg;
-    BITMAP *player;
-    int x, y;
-    int xspeed = 2, yspeed = 2;
-    int facing = 0;
+    BITMAP *player_bmp;
+
     int gameover = 0;
 
     // initialize
@@ -80,11 +87,12 @@ int main(void)
     }
 
     // load player
-    player = load_bitmap("assets/player.bmp", NULL);
+    player_bmp = load_bitmap("assets/player.bmp", NULL);
 
-    // start position of bitmap
-    x = SCREEN_W/2 - player->w/2;
-    y = SCREEN_H/2 - player->h/2;
+    // start position and speed of player
+    player.x = SCREEN_W/2 - player.w/2;
+    player.y = SCREEN_H/2 - player.h/2;
+    player.speed = 2;
 
     // game loop
     while (!gameover)
@@ -97,21 +105,21 @@ int main(void)
         // move bitmap
         if(key[KEY_LEFT] || key[KEY_A])
         {
-            facing = 0;
-            x -= xspeed;
+            player.facing = 0;
+            player.x -= player.speed;
         }
         if(key[KEY_RIGHT] || key[KEY_D])
         {
-            facing = 1;
-            x += xspeed;
+            player.facing = 1;
+            player.x += player.speed;
         }
         if(key[KEY_UP] || key[KEY_W])
         {
-            y -= yspeed;
+            player.y -= player.speed;
         }
         if(key[KEY_DOWN] || key[KEY_S])
         {
-            y += yspeed;
+            player.y += player.speed;
         }
 
         if (key[KEY_SPACE]) ;
@@ -120,14 +128,14 @@ int main(void)
         // fill screen with background image
         blit(bg, buffer, 0, 0, 0, 0, WIDTH, HEIGHT);
 
-        if(facing)
+        if(player.facing)
         {
             //draw the sprite
-            draw_sprite(buffer, player, x, y);
+            draw_sprite(buffer, player_bmp, player.x, player.y);
         }
         else
         {
-            draw_sprite_h_flip(buffer, player, x, y);
+            draw_sprite_h_flip(buffer, player_bmp, player.x, player.y);
         }
 
         ticks++;
@@ -137,7 +145,7 @@ int main(void)
 
         // display allegro/system info
         // TODO: add toggle functionality to display info
-        display_info(buffer, x, y);
+        display_info(buffer, player.x, player.y);
 
         // lock bitmap
         acquire_screen();
@@ -157,7 +165,7 @@ int main(void)
 
     destroy_bitmap(bg);
     destroy_bitmap(buffer);
-    destroy_bitmap(player);
+    destroy_bitmap(player_bmp);
 
     allegro_exit();
     return 0;
