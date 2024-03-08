@@ -7,6 +7,8 @@
 #define HEIGHT 600
 #define WHITE makecol(255,255,255)
 
+BITMAP *bullet_bmp;
+BITMAP *buffer;
 // timer variables
 volatile int counter;
 volatile int ticks;
@@ -39,21 +41,41 @@ void display_info(struct BITMAP *buffer, int x, int y) // x and y track player p
     textprintf_ex(buffer, font, 10, SCREEN_H - 20, WHITE, -1, "Press [ESC] to quit");
 }
 
-struct playerTag {
+struct playerTag
+{
     int x;
     int y;
     int w;
     int h;
     int speed;
     int facing;
-}player;
+} player;
+
+struct bulletTag
+{
+    int x;
+    int y;
+    int alive;
+    int speed;
+} bullet;
+
+void firebullet()
+{
+    // TEST BULLET
+    bullet.alive = 1;
+    bullet.x = player.x + 44;
+    bullet.y = player.y + 24;
+    //load bullet image if necessary
+    if (bullet_bmp == NULL)
+    {
+        bullet_bmp = load_bitmap("assets/bullet.bmp", NULL);
+    }
+}
 
 int main(void)
 {
-    BITMAP *buffer;
     BITMAP *bg;
     BITMAP *player_bmp;
-
     int gameover = 0;
 
     // initialize
@@ -87,16 +109,19 @@ int main(void)
     }
 
     // load player
-    player_bmp = load_bitmap("assets/player.bmp", NULL);
+    player_bmp = load_bitmap("assets/player.bmp", NULL);// load player
 
     // start position and speed of player
     player.x = SCREEN_W/2 - player.w/2;
     player.y = SCREEN_H/2 - player.h/2;
     player.speed = 2;
+    bullet.speed = 4;
 
     // game loop
     while (!gameover)
     {
+        // fill screen with background image
+        blit(bg, buffer, 0, 0, 0, 0, WIDTH, HEIGHT);
         // INPUT /////////////////////////
 
         // short circuit
@@ -121,13 +146,25 @@ int main(void)
         {
             player.y += player.speed;
         }
+        if (key[KEY_SPACE])
+        {
+            firebullet();
+        }
 
-        if (key[KEY_SPACE]) ;
         // UPDATE /////////////////////////////////
 
-        // fill screen with background image
-        blit(bg, buffer, 0, 0, 0, 0, WIDTH, HEIGHT);
+        if(bullet.alive)
+        {
+            // this is so much like the gouls from super mario when you
+            // dont look at them they come for you without retreating.
+            if(player.facing)
+            {
+                bullet.x += (bullet.speed);
+            } else
+                bullet.x -= (bullet.speed);
 
+            draw_sprite(buffer, bullet_bmp, bullet.x, bullet.y);
+        }
         if(player.facing)
         {
             //draw the sprite
@@ -139,7 +176,6 @@ int main(void)
         }
 
         ticks++;
-
 
         // RENDER /////////////////////////////////////////
 
