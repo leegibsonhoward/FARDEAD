@@ -9,6 +9,7 @@
 
 BITMAP *bullet_bmp;
 BITMAP *buffer;
+
 // timer variables
 volatile int counter;
 volatile int ticks;
@@ -48,7 +49,6 @@ struct playerTag
     int w;
     int h;
     int speed;
-    int facing;
 } player;
 
 struct bulletTag
@@ -112,8 +112,8 @@ int main(void)
     player_bmp = load_bitmap("assets/player.bmp", NULL);// load player
 
     // start position and speed of player
-    player.x = SCREEN_W/2 - player.w/2;
-    player.y = SCREEN_H/2 - player.h/2;
+    player.x = SCREEN_W / 8 - player.w / 2;
+    player.y = SCREEN_H / 2 - player.h / 2;
     player.speed = 2;
     bullet.speed = 4;
 
@@ -130,12 +130,10 @@ int main(void)
         // move bitmap
         if(key[KEY_LEFT] || key[KEY_A])
         {
-            player.facing = 0;
             player.x -= player.speed;
         }
         if(key[KEY_RIGHT] || key[KEY_D])
         {
-            player.facing = 1;
             player.x += player.speed;
         }
         if(key[KEY_UP] || key[KEY_W])
@@ -155,25 +153,12 @@ int main(void)
 
         if(bullet.alive)
         {
-            // this is so much like the gouls from super mario when you
-            // dont look at them they come for you without retreating.
-            if(player.facing)
-            {
-                bullet.x += (bullet.speed);
-            } else
-                bullet.x -= (bullet.speed);
-
+            bullet.x += (bullet.speed);
             draw_sprite(buffer, bullet_bmp, bullet.x, bullet.y);
         }
-        if(player.facing)
-        {
+
             //draw the sprite
             draw_sprite(buffer, player_bmp, player.x, player.y);
-        }
-        else
-        {
-            draw_sprite_h_flip(buffer, player_bmp, player.x, player.y);
-        }
 
         ticks++;
 
