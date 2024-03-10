@@ -1,14 +1,18 @@
 #define ALLEGRO_STATICLINK
 
 #include <allegro.h>
-
+#include <stdlib.h>
 #define MODE GFX_AUTODETECT_WINDOWED
 #define WIDTH 800
 #define HEIGHT 600
 #define WHITE makecol(255,255,255)
+#define MAX_BULLETS 1000
 
-BITMAP *bullet_bmp;
+BITMAP *bg;
 BITMAP *buffer;
+
+BITMAP *player_bmp;
+BITMAP *bullet_bmp;
 
 // timer variables
 volatile int counter;
@@ -51,32 +55,35 @@ struct playerTag
     int speed;
 } player;
 
-struct bulletTag
+typedef struct Bullet
 {
     int x;
     int y;
     int alive;
     int speed;
-} bullet;
+} Bullet;
+
+Bullet *bullets[MAX_BULLETS];
 
 void firebullet()
 {
-    // TEST BULLET
-    bullet.alive = 1;
-    bullet.x = player.x + 44;
-    bullet.y = player.y + 24;
-    //load bullet image if necessary
-    if (bullet_bmp == NULL)
+    for(int i = 0; i < MAX_BULLETS; i++)
     {
-        bullet_bmp = load_bitmap("assets/bullet.bmp", NULL);
+        if(!bullets[i]->alive)
+        {
+            bullets[i]->alive++;
+            bullets[i]->x = player.x + 44; // arbitrary location, tip
+            bullets[i]->y = player.y + 24; // of players gun.
+            return;
+        }
     }
 }
 
 int main(void)
 {
-    BITMAP *bg;
-    BITMAP *player_bmp;
     int gameover = 0;
+    int firecount = 0;
+    int firedelay = 20;
 
     // initialize
     allegro_init();
@@ -111,11 +118,24 @@ int main(void)
     // load player
     player_bmp = load_bitmap("assets/player.bmp", NULL);// load player
 
+    if (bullet_bmp == NULL)
+    {
+        bullet_bmp = load_bitmap("assets/bullet.bmp", NULL);
+    }
+
     // start position and speed of player
     player.x = SCREEN_W / 8 - player.w / 2;
     player.y = SCREEN_H / 2 - player.h / 2;
     player.speed = 2;
-    bullet.speed = 4;
+
+    for (int i = 0; i < MAX_BULLETS; i++)
+    {
+        bullets[i] = malloc(sizeof(bullets));
+        bullets[i]->x = 0;
+        bullets[i]->y = 0;
+        bullets[i]->speed = 0;
+        bullets[i]->alive = 0;
+    }
 
     // game loop
     while (!gameover)
@@ -146,21 +166,31 @@ int main(void)
         }
         if (key[KEY_SPACE])
         {
-            firebullet();
+            if (firecount > firedelay)
+            {
+                firecount = 0;
+                firebullet();
+
+            }
         }
 
         // UPDATE /////////////////////////////////
 
-        if(bullet.alive)
+        //draw the sprite
+        draw_sprite(buffer, player_bmp, player.x, player.y);
+
+        for(int i=0; i < MAX_BULLETS; i++)
         {
-            bullet.x += (bullet.speed);
-            draw_sprite(buffer, bullet_bmp, bullet.x, bullet.y);
+            if(bullets[i]->alive)
+            {
+                bullets[i]->speed = 4;
+                bullets[i]->x += (bullets[i]->speed);
+                draw_sprite(buffer, bullet_bmp, bullets[i]->x, bullets[i]->y);
+            }
         }
 
-            //draw the sprite
-            draw_sprite(buffer, player_bmp, player.x, player.y);
-
         ticks++;
+        firecount++;
 
         // RENDER /////////////////////////////////////////
 
@@ -184,9 +214,15 @@ int main(void)
         if(framerate > 60) framerate = 60;
     }
 
+    for(int i =0; i < MAX_BULLETS; i++)
+    {
+        free(bullets[i]);
+    }
+
     destroy_bitmap(bg);
     destroy_bitmap(buffer);
     destroy_bitmap(player_bmp);
+    destroy_bitmap(bullet_bmp);
 
     allegro_exit();
     return 0;
