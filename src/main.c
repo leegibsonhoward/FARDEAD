@@ -46,24 +46,16 @@ void display_info(struct BITMAP *buffer, int x, int y) // x and y track player p
     textprintf_ex(buffer, font, 10, SCREEN_H - 20, WHITE, -1, "Press [ESC] to quit");
 }
 
-struct playerTag
+typedef struct sprite_t
 {
-    int x;
-    int y;
-    int w;
-    int h;
+    int x, y;
+    int w, h;
     int speed;
-} player;
-
-typedef struct Bullet
-{
-    int x;
-    int y;
     int alive;
-    int speed;
-} Bullet;
+} Sprite;
 
-Bullet *bullets[MAX_BULLETS];
+Sprite *player;
+Sprite *bullets[MAX_BULLETS];
 
 void firebullet()
 {
@@ -72,8 +64,8 @@ void firebullet()
         if(!bullets[i]->alive)
         {
             bullets[i]->alive++;
-            bullets[i]->x = player.x + 44; // arbitrary location, tip
-            bullets[i]->y = player.y + 24; // of players gun.
+            bullets[i]->x = player->x + 44; // arbitrary location: tip
+            bullets[i]->y = player->y + 24; // of players gun.
             return;
         }
     }
@@ -123,14 +115,15 @@ int main(void)
         bullet_bmp = load_bitmap("assets/bullet.bmp", NULL);
     }
 
-    // start position and speed of player
-    player.x = SCREEN_W / 8 - player.w / 2;
-    player.y = SCREEN_H / 2 - player.h / 2;
-    player.speed = 2;
+    player = (Sprite*)malloc(sizeof(Sprite));
+    player->x = 150;
+    player->y = 200;
+    player->speed = 2;
+
 
     for (int i = 0; i < MAX_BULLETS; i++)
     {
-        bullets[i] = malloc(sizeof(bullets));
+        bullets[i] = (Sprite*)malloc(sizeof(Sprite));
         bullets[i]->x = 0;
         bullets[i]->y = 0;
         bullets[i]->speed = 0;
@@ -150,19 +143,19 @@ int main(void)
         // move bitmap
         if(key[KEY_LEFT] || key[KEY_A])
         {
-            player.x -= player.speed;
+            player->x -= player->speed;
         }
         if(key[KEY_RIGHT] || key[KEY_D])
         {
-            player.x += player.speed;
+            player->x += player->speed;
         }
         if(key[KEY_UP] || key[KEY_W])
         {
-            player.y -= player.speed;
+            player->y -= player->speed;
         }
         if(key[KEY_DOWN] || key[KEY_S])
         {
-            player.y += player.speed;
+            player->y += player->speed;
         }
         if (key[KEY_SPACE])
         {
@@ -177,7 +170,8 @@ int main(void)
         // UPDATE /////////////////////////////////
 
         //draw the sprite
-        draw_sprite(buffer, player_bmp, player.x, player.y);
+        draw_sprite(buffer, player_bmp, player->x, player->y);
+
 
         for(int i=0; i < MAX_BULLETS; i++)
         {
@@ -196,7 +190,7 @@ int main(void)
 
         // display allegro/system info
         // TODO: add toggle functionality to display info
-        display_info(buffer, player.x, player.y);
+        display_info(buffer, player->x, player->y);
 
         // lock bitmap
         acquire_screen();
