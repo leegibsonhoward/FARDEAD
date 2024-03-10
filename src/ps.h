@@ -13,12 +13,14 @@
 #define WHITE makecol(255,255,255)
 
 #define MAX_BULLETS 1000
+#define MAX_ENEMIES 200
 
 BITMAP *buffer;
 BITMAP *bg;
 
 BITMAP *player_bmp;
 BITMAP *bullet_bmp;
+BITMAP *enemy_bmp;
 
 // timer variables
 volatile int counter;
@@ -36,10 +38,17 @@ typedef struct sprite_t
 
 Sprite *player;
 Sprite *bullets[MAX_BULLETS];
+Sprite *enemies[MAX_ENEMIES];
 
 int gameover = 0;
-int firecount = 0;
-int firedelay = 20;
+
+int bullet_counter = 0;
+int bullet_delay = 20;
+int bullet_count = 0;
+
+int enemy_counter = 0;
+int enemy_delay = 60;
+int enemy_count = 0;
 
 void initialize();
 void load_assets();
@@ -48,5 +57,6 @@ void update();
 void render();
 void display_info();
 void fire_bullet();
+void spawn_enemy();
 
 #endif // PS_H_INCLUDED

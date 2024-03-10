@@ -11,20 +11,23 @@ int main(void)
     // game loop
     while (!gameover)
     {
-
-
         input();
 
         update();
 
         render();
-
     }
 
+    free(player);
     // free resources
     for(int i =0; i < MAX_BULLETS; i++)
     {
         free(bullets[i]);
+    }
+
+    for(int i =0; i < MAX_ENEMIES; i++)
+    {
+        free(enemies[i]);
     }
 
     destroy_bitmap(bg);
@@ -99,6 +102,11 @@ void load_assets()
         bullet_bmp = load_bitmap("assets/bullet.bmp", NULL);
     }
 
+    if (enemy_bmp == NULL)
+    {
+        enemy_bmp = load_bitmap("assets/enemy.bmp", NULL);
+    }
+
     player = (Sprite*)malloc(sizeof(Sprite));
     player->x = 150;
     player->y = 200;
@@ -114,6 +122,14 @@ void load_assets()
         bullets[i]->alive = 0;
     }
 
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        enemies[i] = (Sprite*)malloc(sizeof(Sprite));
+        enemies[i]->x = SCREEN_W;
+        enemies[i]->y = 200;
+        enemies[i]->speed = 0;
+        enemies[i]->alive = 0;
+    }
 }
 
 void input()
@@ -142,12 +158,13 @@ void input()
     }
     if (key[KEY_SPACE])
     {
-        if (firecount > firedelay)
+        if (bullet_counter > bullet_delay)
         {
-            firecount = 0;
+            bullet_counter = 0;
             fire_bullet();
         }
     }
+
 }
 
 void update()
@@ -155,7 +172,8 @@ void update()
     // UPDATE /////////////////////////////////
 
     ticks++;
-    firecount++;
+    bullet_counter++;
+    enemy_counter++;
 
     // slow down the game
     resting = 0;
@@ -179,8 +197,27 @@ void render()
         {
             bullets[i]->speed = 4;
             bullets[i]->x += (bullets[i]->speed);
-            draw_sprite(buffer, bullet_bmp, bullets[i]->x, bullets[i]->y);
+            draw_sprite(buffer, bullet_bmp,  bullets[i]->x, bullets[i]->y);
         }
+    }
+
+    // draw enemies
+    for(int i = 0; i  < MAX_ENEMIES; i++)
+    {
+        if(enemies[i]->alive)
+        {
+            enemies[i]->speed = 1;
+            enemies[i]->x -= (enemies[i]->speed);
+
+            draw_sprite_h_flip(buffer, enemy_bmp, enemies[i]->x, enemies[i]->y);
+        }
+    }
+
+    // spawn enemies with delay
+    if(enemy_counter > enemy_delay)
+    {
+        enemy_counter = 0;
+        spawn_enemy();
     }
 
     // display allegro/system info
@@ -206,6 +243,8 @@ void display_info(struct BITMAP *buffer, int x, int y) // x and y track player p
     textprintf_ex(buffer, font, 10, 10, WHITE, -1, "Ticks: %d", counter);
     textprintf_ex(buffer, font, 10, 20, WHITE, -1, "FPS: %d", framerate);
     textprintf_ex(buffer, font, 10, 30, WHITE, -1, "Player Position: x %d, y %d", x, y);
+    textprintf_ex(buffer, font, 10, 40, WHITE, -1, "Enemy Count: %d", enemy_count);
+    textprintf_ex(buffer, font, 10, 50, WHITE, -1, "Bullet Count: %d", bullet_count);
     textprintf_ex(buffer, font, 10, SCREEN_H - 20, WHITE, -1, "Press [ESC] to quit");
 }
 
@@ -215,9 +254,24 @@ void fire_bullet()
     {
         if(!bullets[i]->alive)
         {
+            bullet_count++;
             bullets[i]->alive++;
             bullets[i]->x = player->x + 44; // arbitrary location: tip
             bullets[i]->y = player->y + 24; // of players gun.
+            return;
+        }
+    }
+}
+void spawn_enemy()
+{
+    for(int i = 0; i < MAX_ENEMIES; i++)
+    {
+        if(!enemies[i]->alive)
+        {
+            enemy_count++;
+            enemies[i]->alive++;
+            enemies[i]->x = enemies[i]->x;
+            enemies[i]->y = rand() % SCREEN_H - 50; // randomize vertical position.
             return;
         }
     }
