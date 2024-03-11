@@ -34,6 +34,9 @@ typedef struct sprite_t
     int w, h;
     int speed;
     int alive;
+    int xdelay,ydelay;
+    int xcount,ycount;
+    int id;
 } Sprite;
 
 Sprite *player;
@@ -41,6 +44,7 @@ Sprite *bullets[MAX_BULLETS];
 Sprite *enemies[MAX_ENEMIES];
 
 int gameover = 0;
+int score = 0;
 
 int bullet_counter = 0;
 int bullet_delay = 20;
@@ -58,5 +62,10 @@ void render();
 void display_info();
 void fire_bullet();
 void spawn_enemy();
+
+void update_sprite(Sprite *spr);
+void update_bullet(Sprite *spr);
+int is_inside(int x,int y,int left,int top,int right,int bottom);
+
 
 #endif // PS_H_INCLUDED
