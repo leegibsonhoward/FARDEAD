@@ -59,12 +59,16 @@ void load_assets();
 void input();
 void update();
 void render();
-void display_info();
-void fire_bullet();
-void spawn_enemy();
 
+void display_info();
+
+void fire_bullet();
 void update_sprite(Sprite *spr);
 void update_bullet(Sprite *spr);
+void update_player();
+void update_bullets();
+void update_enemies();
+
 int is_inside(int x,int y,int left,int top,int right,int bottom);
 
 

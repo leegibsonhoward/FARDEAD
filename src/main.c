@@ -18,8 +18,10 @@ int main(void)
         render();
     }
 
+    // free all resources
+
     free(player);
-    // free resources
+
     for(int i =0; i < MAX_BULLETS; i++)
     {
         free(bullets[i]);
@@ -119,6 +121,21 @@ void load_assets()
     player->ycount = 0;
     player->id = 0;
 
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        enemies[i] = (Sprite*)malloc(sizeof(Sprite));
+        enemies[i]->x = SCREEN_W;
+        enemies[i]->y = rand() % SCREEN_H - 50;
+        enemies[i]->w = 50;
+        enemies[i]->h = 50;
+        enemies[i]->speed = 3;
+        enemies[i]->alive = 0;
+        enemies[i]->xdelay = 4;
+        enemies[i]->ydelay = 0;
+        enemies[i]->xcount = 0;
+        enemies[i]->ycount = 0;
+        enemies[i]->id = 1;
+    }
 
     for (int i = 0; i < MAX_BULLETS; i++)
     {
@@ -133,23 +150,7 @@ void load_assets()
         bullets[i]->ydelay = 0;
         bullets[i]->xcount = 0;
         bullets[i]->ycount = 0;
-        bullets[i]->id = 1;
-    }
-
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
-        enemies[i] = (Sprite*)malloc(sizeof(Sprite));
-        enemies[i]->x = SCREEN_W;
-        enemies[i]->y = 200;
-        enemies[i]->w = 50;
-        enemies[i]->h = 50;
-        enemies[i]->speed = 3;
-        enemies[i]->alive = 0;
-        enemies[i]->xdelay = 4;
-        enemies[i]->ydelay = 0;
-        enemies[i]->xcount = 0;
-        enemies[i]->ycount = 0;
-        enemies[i]->id = 2;
+        bullets[i]->id = 2;
     }
 }
 
@@ -208,36 +209,11 @@ void render()
     // draw background
     blit(bg, buffer, 0, 0, 0, 0, WIDTH, HEIGHT);
 
-    //draw player
-    draw_sprite(buffer, player_bmp, player->x, player->y);
+    update_player();
 
-    // spawn enemies with delay
-    if(enemy_counter > enemy_delay)
-    {
-        enemy_counter = 0;
-        spawn_enemy();
-    }
+    update_enemies();
 
-     // draw enemies
-    for(int i = 0; i  < MAX_ENEMIES; i++)
-    {
-        if(enemies[i]->alive)
-        {
-            update_sprite(enemies[i]);
-            draw_sprite_h_flip(buffer, enemy_bmp, enemies[i]->x, enemies[i]->y);
-        }
-    }
-
-    // draw bullets
-    for(int i=0; i < MAX_BULLETS; i++)
-    {
-        if(bullets[i]->alive)
-        {
-            update_bullet(bullets[i]);
-            draw_sprite(buffer, bullet_bmp,  bullets[i]->x, bullets[i]->y);
-        }
-    }
-
+    update_bullets();
 
     // display allegro/system info
     // TODO: add toggle functionality to display info
@@ -283,30 +259,27 @@ void fire_bullet()
     }
 }
 
-void spawn_enemy()
-{
-    for(int i = 0; i < MAX_ENEMIES; i++)
-    {
-        if(!enemies[i]->alive)
-        {
-            enemy_count++;
-            enemies[i]->alive++;
-            enemies[i]->x = enemies[i]->x;
-            enemies[i]->y = rand() % SCREEN_H - 50; // randomize vertical position.
-            return;
-        }
-    }
-}
-
 void update_sprite(Sprite *spr)
 {
     //update x position
     if (++spr->xcount > spr->xdelay)
     {
         spr->xcount = 0;
-        if(spr->id == 2){
+
+        if(spr->id == 0)
+        {
+            // implemented in input function.
+            // do nothing here.
+            return;
+        }
+        else if (spr->id == 1)
+        {
+            // enemies travel left (-=)
             spr->x -= spr->speed;
-        } else {
+        }
+        else
+        {
+            // everything else travel right
             spr->x += spr->speed;
         }
     }
@@ -353,6 +326,74 @@ void update_bullet(Sprite *spr)
 
         }
     }
+}
+
+void update_player()
+{
+    int n,x,y,x1,y1,x2,y2;
+
+    //update/draw player sprite
+    update_sprite(player);
+
+    draw_sprite(buffer, player_bmp, player->x, player->y);
+
+    //check for collision with enemies
+    x = player->x + player->w/2;
+    y = player->y + player->h/2;
+    for (n=0; n<MAX_ENEMIES; n++)
+    {
+        if (enemies[n]->alive)
+        {
+            x1 = enemies[n]->x;
+            y1 = enemies[n]->y;
+            x2 = x1 + enemies[n]->w;
+            y2 = y1 + enemies[n]->h;
+        }
+        if (is_inside(x,y,x1,y1,x2,y2))
+        {
+            enemies[n]->alive=0;
+            score++;
+        }
+    }
+}
+
+void update_bullets()
+{
+    // draw bullets
+    for(int i=0; i < MAX_BULLETS; i++)
+    {
+        if(bullets[i]->alive)
+        {
+            update_bullet(bullets[i]);
+            draw_sprite(buffer, bullet_bmp,  bullets[i]->x, bullets[i]->y);
+        }
+    }
+
+}
+
+void update_enemies()
+{
+    for(int i = 0; i  < MAX_ENEMIES; i++)
+    {
+        if(enemies[i]->alive)
+        {
+            // update existing enemies
+            update_sprite(enemies[i]);
+            draw_sprite_h_flip(buffer, enemy_bmp, enemies[i]->x, enemies[i]->y);
+        }
+        else
+        {
+            // create new enemies with delay
+            if(enemy_counter > enemy_delay)
+            {
+                enemy_counter = 0;
+                enemy_count++;
+                enemies[i]->alive++;
+                return;
+            }
+        }
+    }
+
 }
 
 int is_inside(int x,int y,int left,int top,int right,int bottom)
