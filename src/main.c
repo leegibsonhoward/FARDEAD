@@ -114,8 +114,9 @@ void load_assets()
     player->y = 200;
     player->y = 50;
     player->y = 50;
-    player->speed = 2;
-    player->xdelay = 1;
+    player->speed = 3;
+    player->alive = 0;
+    player->xdelay = 0;
     player->ydelay = 0;
     player->xcount = 0;
     player->ycount = 0;
@@ -128,9 +129,10 @@ void load_assets()
         enemies[i]->y = rand() % SCREEN_H - 50;
         enemies[i]->w = 50;
         enemies[i]->h = 50;
-        enemies[i]->speed = 3;
+        enemies[i]->speed = 2;
         enemies[i]->alive = 0;
-        enemies[i]->xdelay = 4;
+        enemies[i]->dead = 0;
+        enemies[i]->xdelay = 0;
         enemies[i]->ydelay = 0;
         enemies[i]->xcount = 0;
         enemies[i]->ycount = 0;
@@ -144,8 +146,9 @@ void load_assets()
         bullets[i]->y = 0;
         bullets[i]->w = 9;
         bullets[i]->h = 9;
-        bullets[i]->speed = 2;
+        bullets[i]->speed = 5;
         bullets[i]->alive = 0;
+        bullets[i]->dead = 0;
         bullets[i]->xdelay = 0;
         bullets[i]->ydelay = 0;
         bullets[i]->xcount = 0;
@@ -238,9 +241,10 @@ void display_info(struct BITMAP *buffer, int x, int y) // x and y track player p
     textprintf_ex(buffer, font, 10, 10, WHITE, -1, "Ticks: %d", counter);
     textprintf_ex(buffer, font, 10, 20, WHITE, -1, "FPS: %d", framerate);
     textprintf_ex(buffer, font, 10, 30, WHITE, -1, "Player Position: x %d, y %d", x, y);
-    textprintf_ex(buffer, font, 10, 40, WHITE, -1, "Enemy Count: %d", enemy_count);
-    textprintf_ex(buffer, font, 10, 50, WHITE, -1, "Bullet Count: %d", bullet_count);
-    textprintf_ex(buffer, font, 10, 60, WHITE, -1, "Score: %d", score);
+    textprintf_ex(buffer, font, 10, 40, WHITE, -1, "Enemies Spawned: %d", enemy_count);
+    textprintf_ex(buffer, font, 10, 50, WHITE, -1, "Enemies Killed: %d", enemies_killed);
+    textprintf_ex(buffer, font, 10, 60, WHITE, -1, "Bullet Count: %d", bullet_count);
+    textprintf_ex(buffer, font, 10, 70, WHITE, -1, "Score: %d", score);
     textprintf_ex(buffer, font, 10, SCREEN_H - 20, WHITE, -1, "Press [ESC] to quit");
 }
 
@@ -285,7 +289,6 @@ void update_sprite(Sprite *spr)
     }
 }
 
-
 void update_bullet(Sprite *spr)
 {
     int n,x,y;
@@ -300,7 +303,7 @@ void update_bullet(Sprite *spr)
         return;
     }
 
-    for (n=0; n<MAX_ENEMIES; n++)
+    for (n=0; n < MAX_ENEMIES; n++)
     {
         if (enemies[n]->alive)
         {
@@ -317,13 +320,13 @@ void update_bullet(Sprite *spr)
 
             if (is_inside(x, y, x1, y1, x2, y2))
             {
+                enemies_killed++;
                 enemies[n]->alive=0;
+                enemies[n]->dead=1;
                 spr->alive=0;
-                //startexplosion(spr->x+16, spr->y);
                 score++;
                 break;
             }
-
         }
     }
 }
@@ -352,6 +355,7 @@ void update_player()
         if (is_inside(x,y,x1,y1,x2,y2))
         {
             enemies[n]->alive=0;
+            enemies[n]->dead=1;
             score++;
         }
     }
@@ -368,20 +372,19 @@ void update_bullets()
             draw_sprite(buffer, bullet_bmp,  bullets[i]->x, bullets[i]->y);
         }
     }
-
 }
 
 void update_enemies()
 {
     for(int i = 0; i  < MAX_ENEMIES; i++)
     {
-        if(enemies[i]->alive)
+        if(enemies[i]->alive && !enemies[i]->dead)
         {
             // update existing enemies
             update_sprite(enemies[i]);
             draw_sprite_h_flip(buffer, enemy_bmp, enemies[i]->x, enemies[i]->y);
         }
-        else
+        else if (!enemies[i]->dead)
         {
             // create new enemies with delay
             if(enemy_counter > enemy_delay)
@@ -393,7 +396,6 @@ void update_enemies()
             }
         }
     }
-
 }
 
 int is_inside(int x,int y,int left,int top,int right,int bottom)

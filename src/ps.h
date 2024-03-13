@@ -12,8 +12,8 @@
 
 #define WHITE makecol(255,255,255)
 
-#define MAX_BULLETS 1000
-#define MAX_ENEMIES 200
+#define MAX_BULLETS 100
+#define MAX_ENEMIES 40
 
 BITMAP *buffer;
 BITMAP *bg;
@@ -34,6 +34,7 @@ typedef struct sprite_t
     int w, h;
     int speed;
     int alive;
+    int dead;
     int xdelay,ydelay;
     int xcount,ycount;
     int id;
@@ -45,6 +46,7 @@ Sprite *enemies[MAX_ENEMIES];
 
 int gameover = 0;
 int score = 0;
+int enemies_killed = 0;
 
 int bullet_counter = 0;
 int bullet_delay = 20;
