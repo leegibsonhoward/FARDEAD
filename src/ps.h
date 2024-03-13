@@ -13,7 +13,7 @@
 #define WHITE makecol(255,255,255)
 
 #define MAX_BULLETS 100
-#define MAX_ENEMIES 40
+#define MAX_ENEMIES 10
 
 BITMAP *buffer;
 BITMAP *bg;

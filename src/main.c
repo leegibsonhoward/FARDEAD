@@ -112,8 +112,8 @@ void load_assets()
     player = (Sprite*)malloc(sizeof(Sprite));
     player->x = 150;
     player->y = 200;
-    player->y = 50;
-    player->y = 50;
+    player->w = 50;
+    player->h = 50;
     player->speed = 3;
     player->alive = 0;
     player->xdelay = 0;
@@ -168,18 +168,27 @@ void input()
     if(key[KEY_LEFT] || key[KEY_A])
     {
         player->x -= player->speed;
+        if (player->x < 0)
+            player->x = 0;
     }
     if(key[KEY_RIGHT] || key[KEY_D])
     {
         player->x += player->speed;
+        if (player->x > (SCREEN_W - player->w) / 4)
+            // player right bounds 1/4 of screen width
+            player->x = (SCREEN_W - player->w) / 4;
     }
     if(key[KEY_UP] || key[KEY_W])
     {
         player->y -= player->speed;
+        if (player->y < 0)
+            player->y = 0;
     }
     if(key[KEY_DOWN] || key[KEY_S])
     {
         player->y += player->speed;
+        if (player->y > SCREEN_H - player->h)
+            player->y = SCREEN_H - player->h;
     }
     if (key[KEY_SPACE])
     {
@@ -333,7 +342,7 @@ void update_bullet(Sprite *spr)
 
 void update_player()
 {
-    int n,x,y,x1,y1,x2,y2;
+    int n,x,y,x1=0,y1=0,x2=0,y2=0;
 
     //update/draw player sprite
     update_sprite(player);
