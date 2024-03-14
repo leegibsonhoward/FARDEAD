@@ -126,7 +126,7 @@ void load_assets()
     {
         enemies[i] = (Sprite*)malloc(sizeof(Sprite));
         enemies[i]->x = SCREEN_W;
-        enemies[i]->y = rand() % SCREEN_H - 50;
+        enemies[i]->y = rand() % ((SCREEN_H - 50) + 1);
         enemies[i]->w = 50;
         enemies[i]->h = 50;
         enemies[i]->speed = 2;
