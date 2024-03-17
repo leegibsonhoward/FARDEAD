@@ -1,12 +1,10 @@
 #ifndef PS_H_INCLUDED
 #define PS_H_INCLUDED
 
-#define ALLEGRO_STATICLINK
-
 #include <allegro.h>
 #include <stdlib.h>
 
-#define MODE GFX_AUTODETECT_WINDOWED
+#define MODE GFX_AUTODETECT
 #define WIDTH 320
 #define HEIGHT 200
 

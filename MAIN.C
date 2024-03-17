@@ -64,7 +64,7 @@ void initialize()
 {
     // initialize
     allegro_init();
-    set_color_depth(24);
+    set_color_depth(16);
     set_gfx_mode(MODE, WIDTH, HEIGHT, 0, 0);
     install_keyboard();
     install_timer();
@@ -89,7 +89,7 @@ void initialize()
 void load_assets()
 {
     // load background
-    bg = load_bitmap("assets/bg.bmp", NULL);
+    bg = load_bitmap("bg.bmp", NULL);
     if (!bg)
     {
         allegro_message("background::\n%s", allegro_error);
@@ -97,16 +97,16 @@ void load_assets()
     }
 
     // load player
-    player_bmp = load_bitmap("assets/player.bmp", NULL);// load player
+    player_bmp = load_bitmap("player.bmp", NULL);// load player
 
     if (bullet_bmp == NULL)
     {
-        bullet_bmp = load_bitmap("assets/bullet.bmp", NULL);
+        bullet_bmp = load_bitmap("bullet.bmp", NULL);
     }
 
     if (enemy_bmp == NULL)
     {
-        enemy_bmp = load_bitmap("assets/enemy.bmp", NULL);
+        enemy_bmp = load_bitmap("enemy.bmp", NULL);
     }
 
     player = (Sprite*)malloc(sizeof(Sprite));
@@ -114,9 +114,9 @@ void load_assets()
     player->y = 80;
     player->w = 50;
     player->h = 50;
-    player->speed = 3;
+    player->speed = 1;
     player->alive = 0;
-    player->xdelay = 0;
+    player->xdelay = 1;
     player->ydelay = 0;
     player->xcount = 0;
     player->ycount = 0;
@@ -129,10 +129,10 @@ void load_assets()
         enemies[i]->y = rand() % ((SCREEN_H - 50) + 1 - 60) + 60;
         enemies[i]->w = 50;
         enemies[i]->h = 50;
-        enemies[i]->speed = 2;
+        enemies[i]->speed = 3;
         enemies[i]->alive = 0;
         enemies[i]->dead = 0;
-        enemies[i]->xdelay = 0;
+        enemies[i]->xdelay = 1;
         enemies[i]->ydelay = 0;
         enemies[i]->xcount = 0;
         enemies[i]->ycount = 0;
@@ -146,10 +146,10 @@ void load_assets()
         bullets[i]->y = 0;
         bullets[i]->w = 9;
         bullets[i]->h = 9;
-        bullets[i]->speed = 5;
+        bullets[i]->speed = 4;
         bullets[i]->alive = 0;
         bullets[i]->dead = 0;
-        bullets[i]->xdelay = 0;
+        bullets[i]->xdelay = 1;
         bullets[i]->ydelay = 0;
         bullets[i]->xcount = 0;
         bullets[i]->ycount = 0;
@@ -240,7 +240,7 @@ void render()
 
     // prevent going above 60FPS
     // TODO: cap actual game speed
-    if(framerate > 60) framerate = 60;
+    // if(framerate > 60) framerate = 60;
 
 }
 
