@@ -1,5 +1,5 @@
-#ifndef PS_H_INCLUDED
-#define PS_H_INCLUDED
+#ifndef FARDEAD_H_INCLUDED
+#define FARDEAD_H_INCLUDED
 
 #include <allegro.h>
 #include <stdlib.h>
@@ -72,4 +72,4 @@ void update_enemies();
 int is_inside(int x,int y,int left,int top,int right,int bottom);
 
 
-#endif // PS_H_INCLUDED
+#endif // FARDEAD_H_INCLUDED

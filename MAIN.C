@@ -1,5 +1,5 @@
 
-#include "ps.h"
+#include "fardead.h"
 
 int main(void)
 {
