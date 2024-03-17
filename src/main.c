@@ -89,7 +89,7 @@ void initialize()
 void load_assets()
 {
     // load background
-    bg = load_bitmap("assets/bluespace.bmp", NULL);
+    bg = load_bitmap("assets/bg.bmp", NULL);
     if (!bg)
     {
         allegro_message("background::\n%s", allegro_error);
@@ -110,8 +110,8 @@ void load_assets()
     }
 
     player = (Sprite*)malloc(sizeof(Sprite));
-    player->x = 150;
-    player->y = 200;
+    player->x = 30;
+    player->y = 80;
     player->w = 50;
     player->h = 50;
     player->speed = 3;
@@ -126,7 +126,7 @@ void load_assets()
     {
         enemies[i] = (Sprite*)malloc(sizeof(Sprite));
         enemies[i]->x = SCREEN_W;
-        enemies[i]->y = rand() % ((SCREEN_H - 50) + 1);
+        enemies[i]->y = rand() % ((SCREEN_H - 50) + 1 - 60) + 60;
         enemies[i]->w = 50;
         enemies[i]->h = 50;
         enemies[i]->speed = 2;

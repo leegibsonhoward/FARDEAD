@@ -7,8 +7,8 @@
 #include <stdlib.h>
 
 #define MODE GFX_AUTODETECT_WINDOWED
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 320
+#define HEIGHT 200
 
 #define WHITE makecol(255,255,255)
 
