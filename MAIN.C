@@ -174,15 +174,15 @@ void input()
     if(key[KEY_RIGHT] || key[KEY_D])
     {
         player->x += player->speed;
-        if (player->x > (SCREEN_W - player->w) / 4)
+        if (player->x > (SCREEN_W - player->w) / 2)
             // player right bounds 1/4 of screen width
-            player->x = (SCREEN_W - player->w) / 4;
+            player->x = (SCREEN_W - player->w) / 2;
     }
     if(key[KEY_UP] || key[KEY_W])
     {
         player->y -= player->speed;
-        if (player->y < 0)
-            player->y = 0;
+        if (player->y < 60)
+            player->y = 60;
     }
     if(key[KEY_DOWN] || key[KEY_S])
     {
